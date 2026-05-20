@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>FastBurguer - Pedidos Online</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B00',
+                        secondary: '#FFCC00',
+                        dark: '#000000',
+                        darkgray: '#1a1a1a',
+                        lightgray: '#2a2a2a'
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { font-family: 'Poppins', sans-serif; }
+        body { background: #000; color: #fff; overflow-x: hidden; }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #FF6B00; border-radius: 3px; }
+
+        /* Animaciones */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes glow { 0%, 100% { box-shadow: 0 0 5px #FF6B00; } 50% { box-shadow: 0 0 20px #FF6B00, 0 0 40px #FF6B00; } }
+
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        .pulse-glow { animation: pulse 2s infinite, glow 2s infinite; }
+
+        /* Cards de productos */
+        .product-card {
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            border: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+        .product-card:hover { border-color: #FF6B00; transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255,107,0,0.2); }
+        .product-card.no-disponible { opacity: 0.5; filter: grayscale(0.8); pointer-events: none; }
+
+        /* Botones */
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B00, #FF8533);
+            border: none;
+            color: white;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover { transform: scale(1.05); box-shadow: 0 5px 25px rgba(255,107,0,0.4); }
+        .btn-primary:active { transform: scale(0.95); }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #FFCC00;
+            color: #FFCC00;
+            font-weight: 600;
+        }
+        .btn-secondary:hover { background: #FFCC00; color: #000; }
+
+        /* Input styles */
+        .input-dark {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: white;
+            transition: all 0.3s;
+        }
+        .input-dark:focus { border-color: #FF6B00; outline: none; box-shadow: 0 0 10px rgba(255,107,0,0.3); }
+
+        /* Carrito */
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #FF6B00;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Categorías */
+        .category-btn {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #aaa;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .category-btn.active, .category-btn:hover {
+            background: linear-gradient(135deg, #FF6B00, #FF8533);
+            color: white;
+            border-color: #FF6B00;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Loader */
+        .loader {
+            border: 3px solid #1a1a1a;
+            border-top: 3px solid #FF6B00;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #FF6B00;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* Admin panel */
+        .admin-card { background: #1a1a1a; border-left: 4px solid #FF6B00; }
+        .status-pendiente { color: #FFCC00; }
+        .status-proceso { color: #FF6B00; }
+        .status-entregado { color: #00ff88; }
+        .status-cancelado { color: #ff4444; }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .product-grid { grid-template-columns: 1fr !important; }
+            .category-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        }
+    </style>
+</head>
+<body class="bg-dark min-h-screen">
+    <!-- APP CONTAINER -->
+    <div id="app">
+        <!-- LOADING SCREEN -->
+        <div id="loading-screen" class="fixed inset-0 bg-dark z-50 flex flex-col items-center justify-center">
+            <div class="loader mb-4"></div>
+            <h2 class="text-primary text-xl font-bold">FastBurguer</h2>
+            <p class="text-gray-400 text-sm mt-2">Cargando menú...</p>
+        </div>
+
+        <!-- HEADER -->
+        <header class="fixed top-0 left-0 right-0 bg-dark/95 backdrop-blur-md z-40 border-b border-gray-800">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-burger text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-white leading-tight">FastBurguer</h1>
+                        <p class="text-xs text-primary">¡Pide ya!</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <!-- Selector de moneda -->
+                    <select id="currency-select" class="bg-darkgray border border-gray-700 rounded-lg px-2 py-1 text-sm text-white focus:border-primary focus:outline-none">
+                        <option value="USD">$ USD</option>
+                        <option value="VES">Bs</option>
+                    </select>
+                    <!-- Botón carrito -->
+                    <button onclick="showCart()" class="relative p-2 text-white hover:text-primary transition">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span id="cart-badge" class="cart-badge hidden">0</span>
+                    </button>
+                    <!-- Botón admin -->
+                    <button onclick="showLogin()" class="p-2 text-gray-400 hover:text-primary transition">
+                        <i class="fas fa-user-shield text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="pt-20 pb-24 px-4 max-w-6xl mx-auto">
+            <!-- HERO / ESTADO TIENDA -->
+            <div id="store-status" class="mb-6 text-center">
+                <div class="inline-flex items-center gap-2 bg-green-900/30 border border-green-500/30 rounded-full px-4 py-2">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-green-400 text-sm font-semibold">¡Abierto! - Realiza tu pedido</span>
+                </div>
+            </div>
+
+            <!-- CATEGORÍAS -->
+            <div class="category-scroll flex gap-2 mb-6 overflow-x-auto pb-2">
+                <button onclick="filterCategory('all')" class="category-btn active px-4 py-2 rounded-full text-sm font-medium">Todos</button>
+                <button onclick="filterCategory('G001')" class="category-btn px-4 py-2 rounded-full text-sm font-medium">Hamburguesas</button>
+                <button onclick="filterCategory('G002')" class="category-btn px-4 py-2 rounded-full text-sm font-medium">Especialidades</button>
+                <button onclick="filterCategory('G003')" class="category-btn px-4 py-2 rounded-full text-sm font-medium">Salchipapas</button>
+                <button onclick="filterCategory('G004')" class="category-btn px-4 py-2 rounded-full text-sm font-medium">Promociones</button>
+                <button onclick="filterCategory('G005')" class="category-btn px-4 py-2 rounded-full text-sm font-medium">Bebidas</button>
+                <button onclick="filterCategory('G006')" class="category-btn px-4 py-2 rounded-full text-sm font-medium">Adicionales</button>
+            </div>
+
+            <!-- BÚSQUEDA -->
+            <div class="mb-6">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="text" id="search-input" placeholder="Buscar hamburguesa, salchipapa..." 
+                        class="input-dark w-full pl-10 pr-4 py-3 rounded-xl text-sm"
+                        oninput="searchProducts(this.value)">
+                </div>
+            </div>
+
+            <!-- PRODUCTOS -->
+            <div id="products-container" class="product-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Los productos se cargan dinámicamente -->
+            </div>
+        </main>
+
+        <!-- BOTTOM NAV -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-darkgray/95 backdrop-blur-md border-t border-gray-800 z-40">
+            <div class="max-w-6xl mx-auto px-4 py-2 flex justify-around items-center">
+                <button onclick="showMenu()" class="flex flex-col items-center gap-1 p-2 text-primary">
+                    <i class="fas fa-utensils text-xl"></i>
+                    <span class="text-xs">Menú</span>
+                </button>
+                <button onclick="showCart()" class="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-primary transition relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span class="text-xs">Carrito</span>
+                    <span id="nav-cart-badge" class="absolute top-0 right-2 w-4 h-4 bg-primary rounded-full text-xs flex items-center justify-center hidden">0</span>
+                </button>
+                <button onclick="showOrders()" class="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-primary transition">
+                    <i class="fas fa-receipt text-xl"></i>
+                    <span class="text-xs">Pedidos</span>
+                </button>
+                <button onclick="showLogin()" class="flex flex-col items-center gap-1 p-2 text-gray-400 hover:text-primary transition">
+                    <i class="fas fa-user text-xl"></i>
+                    <span class="text-xs">Admin</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- CART MODAL -->
+    <div id="cart-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="hideCart()"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-darkgray slide-in flex flex-col">
+            <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-white"><i class="fas fa-shopping-cart text-primary mr-2"></i>Tu Pedido</h2>
+                <button onclick="hideCart()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div id="cart-items" class="flex-1 overflow-y-auto p-4">
+                <!-- Items del carrito -->
+            </div>
+            <div class="p-4 border-t border-gray-800 bg-dark">
+                <div class="flex justify-between mb-2 text-gray-400">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal">$0.00</span>
+                </div>
+                <div class="flex justify-between mb-4 text-xl font-bold text-white">
+                    <span>Total</span>
+                    <span id="cart-total" class="text-primary">$0.00</span>
+                </div>
+                <button onclick="showCheckout()" class="btn-primary w-full py-4 rounded-xl text-lg font-bold">
+                    Finalizar Pedido <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="hideCheckout()"></div>
+        <div class="absolute inset-x-4 top-20 bottom-20 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-lg bg-darkgray rounded-2xl overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-white">Finalizar Pedido</h2>
+                <button onclick="hideCheckout()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4">
+                <!-- Resumen -->
+                <div class="bg-dark rounded-xl p-4 mb-4">
+                    <h3 class="text-sm font-semibold text-gray-400 mb-2">Resumen</h3>
+                    <div id="checkout-summary" class="space-y-2"></div>
+                    <div class="border-t border-gray-700 mt-2 pt-2 flex justify-between font-bold text-primary">
+                        <span>Total</span>
+                        <span id="checkout-total">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Tipo de servicio -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-400 mb-2">Tipo de servicio</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setServiceType('sitiio')" id="btn-sitiio" class="service-btn bg-dark border border-gray-700 rounded-xl p-3 text-center hover:border-primary transition">
+                            <i class="fas fa-chair text-primary text-xl mb-1 block"></i>
+                            <span class="text-xs">En sitio</span>
+                        </button>
+                        <button onclick="setServiceType('pickup')" id="btn-pickup" class="service-btn bg-dark border border-gray-700 rounded-xl p-3 text-center hover:border-primary transition">
+                            <i class="fas fa-store text-primary text-xl mb-1 block"></i>
+                            <span class="text-xs">Pick Up</span>
+                        </button>
+                        <button onclick="setServiceType('delivery')" id="btn-delivery" class="service-btn bg-dark border border-gray-700 rounded-xl p-3 text-center hover:border-primary transition">
+                            <i class="fas fa-motorcycle text-primary text-xl mb-1 block"></i>
+                            <span class="text-xs">Delivery</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Datos cliente -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-400 mb-1">Nombre completo *</label>
+                        <input type="text" id="client-name" class="input-dark w-full px-4 py-3 rounded-xl" placeholder="Tu nombre">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-400 mb-1">WhatsApp *</label>
+                        <input type="tel" id="client-phone" class="input-dark w-full px-4 py-3 rounded-xl" placeholder="0412-1234567">
+                    </div>
+                    <div id="delivery-address-container" class="hidden">
+                        <label class="block text-sm font-semibold text-gray-400 mb-1">Dirección de entrega *</label>
+                        <textarea id="client-address" class="input-dark w-full px-4 py-3 rounded-xl" rows="2" placeholder="Calle, casa, punto de referencia..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-400 mb-1">Observaciones</label>
+                        <textarea id="client-notes" class="input-dark w-full px-4 py-3 rounded-xl" rows="2" placeholder="Sin cebolla, salsa aparte..."></textarea>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="promo-register" class="w-4 h-4 accent-primary rounded">
+                        <label for="promo-register" class="text-sm text-gray-400">Quiero recibir promociones y ofertas especiales</label>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-800">
+                <button onclick="submitOrder()" class="btn-primary w-full py-4 rounded-xl text-lg font-bold pulse-glow">
+                    <i class="fab fa-whatsapp mr-2"></i>Enviar Pedido por WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="hideLogin()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-darkgray rounded-2xl p-6 w-full max-w-sm">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-lock text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white">Panel Administrativo</h2>
+                </div>
+                <div class="space-y-3">
+                    <input type="text" id="admin-user" class="input-dark w-full px-4 py-3 rounded-xl" placeholder="Usuario">
+                    <input type="password" id="admin-pass" class="input-dark w-full px-4 py-3 rounded-xl" placeholder="Contraseña">
+                    <button onclick="doLogin()" class="btn-primary w-full py-3 rounded-xl font-bold">Ingresar</button>
+                </div>
+                <p class="text-center text-gray-500 text-sm mt-4">FastBurguer Admin v1.0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="admin-panel" class="fixed inset-0 z-50 hidden bg-dark">
+        <div class="h-full flex flex-col">
+            <div class="bg-darkgray border-b border-gray-800 p-4 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-white"><i class="fas fa-cog text-primary mr-2"></i>Administración</h2>
+                <button onclick="hideAdmin()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4">
+                <!-- Stats -->
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="admin-card p-4 rounded-xl">
+                        <p class="text-gray-400 text-xs">Pedidos Hoy</p>
+                        <p class="text-2xl font-bold text-primary" id="admin-pedidos-hoy">0</p>
+                    </div>
+                    <div class="admin-card p-4 rounded-xl">
+                        <p class="text-gray-400 text-xs">Ventas Hoy</p>
+                        <p class="text-2xl font-bold text-secondary" id="admin-ventas-hoy">$0</p>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex gap-2 mb-4 overflow-x-auto">
+                    <button onclick="showAdminTab('pedidos')" class="admin-tab active px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium">Pedidos</button>
+                    <button onclick="showAdminTab('productos')" class="admin-tab px-4 py-2 rounded-lg bg-darkgray text-gray-400 text-sm font-medium">Productos</button>
+                    <button onclick="showAdminTab('tasas')" class="admin-tab px-4 py-2 rounded-lg bg-darkgray text-gray-400 text-sm font-medium">Tasas</button>
+                </div>
+
+                <!-- Contenido tabs -->
+                <div id="admin-content">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ==================== DATOS Y ESTADO ====================
+        let appData = { productos: [], tasas: [], categorias: [] };
+        let cart = [];
+        let currentCurrency = 'USD';
+        let currentCategory = 'all';
+        let serviceType = '';
+        let exchangeRate = 500; // Tasa por defecto
+        let isLoggedIn = false;
+        let orders = JSON.parse(localStorage.getItem('fastburguer_orders') || '[]');
+
+        // ==================== INICIALIZACIÓN ====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadData();
+            renderProducts();
+            updateCartUI();
+            document.getElementById('loading-screen').style.display = 'none';
+        });
+
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                appData = await response.json();
+                // Obtener tasa del dólar
+                const tasaUSD = appData.tasas.find(t => t.codigo === 'T002');
+                if (tasaUSD) exchangeRate = tasaUSD.valor;
+            } catch (e) {
+                console.error('Error cargando datos:', e);
+                showToast('Error cargando menú');
+            }
+        }
+
+        // ==================== RENDERIZADO ====================
+        function renderProducts() {
+            const container = document.getElementById('products-container');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+            let filtered = appData.productos.filter(p => p.estado === 'Activo');
+
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(p => p.categoria === currentCategory);
+            }
+
+            if (searchTerm) {
+                filtered = filtered.filter(p => 
+                    p.nombre.toLowerCase().includes(searchTerm) || 
+                    p.descripcion.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            container.innerHTML = filtered.map(product => `
+                <div class="product-card ${product.disponible ? '' : 'no-disponible'} rounded-2xl overflow-hidden fade-in">
+                    <div class="h-48 bg-gradient-to-br from-darkgray to-lightgray flex items-center justify-center relative">
+                        <i class="fas fa-burger text-6xl ${product.disponible ? 'text-primary/30' : 'text-gray-600'}"></i>
+                        ${!product.disponible ? '<span class="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded-full">Agotado</span>' : ''}
+                        ${product.categoriaNombre ? `<span class="absolute top-2 left-2 bg-primary/80 text-white text-xs px-2 py-1 rounded-full">${product.categoriaNombre}</span>` : ''}
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-white mb-1">${product.nombre}</h3>
+                        <p class="text-gray-400 text-sm mb-3 line-clamp-2">${product.descripcion}</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-2xl font-bold text-primary">${formatPrice(product.precioUSD)}</span>
+                                ${currentCurrency === 'VES' ? `<span class="text-xs text-gray-500 block">${formatBs(product.precioUSD)}</span>` : ''}
+                            </div>
+                            ${product.disponible ? `
+                                <button onclick="addToCart('${product.codigo}')" class="btn-primary w-12 h-12 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-plus text-lg"></i>
+                                </button>
+                            ` : '<span class="text-gray-500 text-sm">No disponible</span>'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatPrice(usd) {
+            if (currentCurrency === 'USD') return `$${usd.toFixed(2)}`;
+            return `Bs ${(usd * exchangeRate).toFixed(2)}`;
+        }
+
+        function formatBs(usd) {
+            return `Bs ${(usd * exchangeRate).toFixed(2)}`;
+        }
+
+        // ==================== CATEGORÍAS Y BÚSQUEDA ====================
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('active', 
+                    (cat === 'all' && btn.textContent === 'Todos') || 
+                    btn.getAttribute('onclick').includes(cat)
+                );
+            });
+            renderProducts();
+        }
+
+        function searchProducts(term) {
+            renderProducts();
+        }
+
+        // ==================== CARRITO ====================
+        function addToCart(codigo) {
+            const product = appData.productos.find(p => p.codigo === codigo);
+            if (!product || !product.disponible) {
+                showToast('Producto no disponible');
+                return;
+            }
+
+            const existing = cart.find(item => item.codigo === codigo);
+            if (existing) {
+                existing.cantidad++;
+            } else {
+                cart.push({
+                    codigo: product.codigo,
+                    nombre: product.nombre,
+                    precioUSD: product.precioUSD,
+                    cantidad: 1
+                });
+            }
+
+            updateCartUI();
+            showToast(`${product.nombre} agregado`);
+        }
+
+        function removeFromCart(codigo) {
+            cart = cart.filter(item => item.codigo !== codigo);
+            updateCartUI();
+        }
+
+        function updateQuantity(codigo, delta) {
+            const item = cart.find(i => i.codigo === codigo);
+            if (item) {
+                item.cantidad += delta;
+                if (item.cantidad <= 0) {
+                    removeFromCart(codigo);
+                } else {
+                    updateCartUI();
+                }
+            }
+        }
+
+        function updateCartUI() {
+            const totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
+            const totalUSD = cart.reduce((sum, item) => sum + (item.precioUSD * item.cantidad), 0);
+
+            // Badges
+            const badge = document.getElementById('cart-badge');
+            const navBadge = document.getElementById('nav-cart-badge');
+
+            if (totalItems > 0) {
+                badge.textContent = totalItems;
+                badge.classList.remove('hidden');
+                navBadge.textContent = totalItems;
+                navBadge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+                navBadge.classList.add('hidden');
+            }
+
+            // Cart items
+            const cartItems = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-shopping-basket text-6xl text-gray-700 mb-4"></i>
+                        <p class="text-gray-500">Tu carrito está vacío</p>
+                        <button onclick="hideCart(); showMenu();" class="btn-secondary mt-4 px-6 py-2 rounded-full">Ver menú</button>
+                    </div>
+                `;
+            } else {
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="flex items-center gap-3 bg-dark rounded-xl p-3 mb-2">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-white text-sm">${item.nombre}</h4>
+                            <p class="text-primary text-sm">${formatPrice(item.precioUSD)} c/u</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateQuantity('${item.codigo}', -1)" class="w-8 h-8 rounded-full bg-darkgray text-white hover:bg-primary transition">
+                                <i class="fas fa-minus text-xs"></i>
+                            </button>
+                            <span class="w-8 text-center font-bold">${item.cantidad}</span>
+                            <button onclick="updateQuantity('${item.codigo}', 1)" class="w-8 h-8 rounded-full bg-darkgray text-white hover:bg-primary transition">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                        <button onclick="removeFromCart('${item.codigo}')" class="text-red-500 hover:text-red-400 ml-2">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('cart-subtotal').textContent = formatPrice(totalUSD);
+            document.getElementById('cart-total').textContent = formatPrice(totalUSD);
+        }
+
+        // ==================== MODALES ====================
+        function showCart() {
+            document.getElementById('cart-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideCart() {
+            document.getElementById('cart-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function showCheckout() {
+            if (cart.length === 0) {
+                showToast('Agrega productos al carrito');
+                return;
+            }
+            hideCart();
+            document.getElementById('checkout-modal').classList.remove('hidden');
+
+            // Render resumen
+            const totalUSD = cart.reduce((sum, item) => sum + (item.precioUSD * item.cantidad), 0);
+            document.getElementById('checkout-summary').innerHTML = cart.map(item => `
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-300">${item.cantidad}x ${item.nombre}</span>
+                    <span class="text-white">${formatPrice(item.precioUSD * item.cantidad)}</span>
+                </div>
+            `).join('');
+            document.getElementById('checkout-total').textContent = formatPrice(totalUSD);
+        }
+
+        function hideCheckout() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        }
+
+        function setServiceType(type) {
+            serviceType = type;
+            document.querySelectorAll('.service-btn').forEach(btn => {
+                btn.classList.remove('border-primary', 'bg-primary/10');
+                btn.classList.add('border-gray-700');
+            });
+            document.getElementById(`btn-${type}`).classList.add('border-primary', 'bg-primary/10');
+            document.getElementById(`btn-${type}`).classList.remove('border-gray-700');
+
+            // Mostrar/ocultar dirección
+            document.getElementById('delivery-address-container').classList.toggle('hidden', type !== 'delivery');
+        }
+
+        // ==================== PEDIDO ====================
+        function submitOrder() {
+            const name = document.getElementById('client-name').value.trim();
+            const phone = document.getElementById('client-phone').value.trim();
+            const address = document.getElementById('client-address').value.trim();
+            const notes = document.getElementById('client-notes').value.trim();
+            const promo = document.getElementById('promo-register').checked;
+
+            // Validaciones
+            if (!name || !phone) {
+                showToast('Completa nombre y WhatsApp');
+                return;
+            }
+            if (serviceType === 'delivery' && !address) {
+                showToast('Ingresa dirección de entrega');
+                return;
+            }
+            if (!serviceType) {
+                showToast('Selecciona tipo de servicio');
+                return;
+            }
+
+            const totalUSD = cart.reduce((sum, item) => sum + (item.precioUSD * item.cantidad), 0);
+            const orderId = 'PED' + Date.now().toString().slice(-6);
+
+            const order = {
+                id: orderId,
+                fecha: new Date().toLocaleDateString(),
+                hora: new Date().toLocaleTimeString(),
+                cliente: name,
+                telefono: phone,
+                direccion: address,
+                tipo: serviceType,
+                productos: [...cart],
+                totalUSD: totalUSD,
+                totalBs: totalUSD * exchangeRate,
+                moneda: currentCurrency,
+                notas: notes,
+                promo: promo,
+                estado: 'Pendiente',
+                pago: 'Pendiente'
+            };
+
+            orders.push(order);
+            localStorage.setItem('fastburguer_orders', JSON.stringify(orders));
+
+            // Generar mensaje WhatsApp
+            let msg = `🍔 *FASTBURGUER - NUEVO PEDIDO*\n`;
+            msg += `📋 Pedido: *${orderId}*\n\n`;
+            msg += `👤 *Cliente:* ${name}\n`;
+            msg += `📱 *WhatsApp:* ${phone}\n`;
+            msg += `🚚 *Servicio:* ${serviceType.toUpperCase()}\n`;
+            if (address) msg += `📍 *Dirección:* ${address}\n`;
+            msg += `\n📦 *PRODUCTOS:*\n`;
+            cart.forEach(item => {
+                msg += `• ${item.cantidad}x ${item.nombre} - $${(item.precioUSD * item.cantidad).toFixed(2)}\n`;
+            });
+            msg += `\n💰 *Total: $${totalUSD.toFixed(2)}*\n`;
+            msg += `💰 *Total Bs: ${(totalUSD * exchangeRate).toFixed(2)}*\n`;
+            if (notes) msg += `\n📝 *Notas:* ${notes}\n`;
+            msg += `\n✅ Confirmar pedido respondiendo este mensaje`;
+
+            // Abrir WhatsApp
+            const whatsappUrl = `https://wa.me/584127778888?text=${encodeURIComponent(msg)}`;
+            window.open(whatsappUrl, '_blank');
+
+            // Limpiar
+            cart = [];
+            updateCartUI();
+            hideCheckout();
+            showToast(`¡Pedido ${orderId} enviado!`);
+
+            // Mostrar confirmación
+            showOrderConfirmation(order);
+        }
+
+        function showOrderConfirmation(order) {
+            // Crear modal de confirmación dinámicamente
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+                <div class="modal-overlay absolute inset-0" onclick="this.parentElement.remove()"></div>
+                <div class="bg-darkgray rounded-2xl p-6 max-w-sm w-full relative z-10 text-center">
+                    <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check text-green-500 text-3xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">¡Pedido Enviado!</h2>
+                    <p class="text-gray-400 mb-4">Número: <span class="text-primary font-bold">${order.id}</span></p>
+                    <p class="text-sm text-gray-500 mb-4">Te contactaremos por WhatsApp para confirmar</p>
+                    <button onclick="this.closest('.fixed').remove()" class="btn-primary w-full py-3 rounded-xl">Entendido</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // ==================== ADMIN ====================
+        function showLogin() {
+            if (isLoggedIn) {
+                showAdmin();
+                return;
+            }
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        function hideLogin() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function doLogin() {
+            const user = document.getElementById('admin-user').value;
+            const pass = document.getElementById('admin-pass').value;
+
+            if (user === 'admin' && pass === '123') {
+                isLoggedIn = true;
+                hideLogin();
+                showAdmin();
+                showToast('Bienvenido, Admin');
+            } else {
+                showToast('Credenciales incorrectas');
+            }
+        }
+
+        function showAdmin() {
+            document.getElementById('admin-panel').classList.remove('hidden');
+            renderAdminPedidos();
+        }
+
+        function hideAdmin() {
+            document.getElementById('admin-panel').classList.add('hidden');
+        }
+
+        function showAdminTab(tab) {
+            document.querySelectorAll('.admin-tab').forEach(t => {
+                t.classList.remove('active', 'bg-primary', 'text-white');
+                t.classList.add('bg-darkgray', 'text-gray-400');
+            });
+            event.target.classList.add('active', 'bg-primary', 'text-white');
+            event.target.classList.remove('bg-darkgray', 'text-gray-400');
+
+            if (tab === 'pedidos') renderAdminPedidos();
+            else if (tab === 'productos') renderAdminProductos();
+            else if (tab === 'tasas') renderAdminTasas();
+        }
+
+        function renderAdminPedidos() {
+            const content = document.getElementById('admin-content');
+            if (orders.length === 0) {
+                content.innerHTML = '<p class="text-gray-500 text-center py-8">No hay pedidos registrados</p>';
+                return;
+            }
+
+            content.innerHTML = orders.slice().reverse().map(order => `
+                <div class="admin-card p-4 rounded-xl mb-3">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="text-primary font-bold">${order.id}</span>
+                            <span class="text-gray-500 text-xs ml-2">${order.fecha} ${order.hora}</span>
+                        </div>
+                        <span class="status-${order.estado.toLowerCase()} text-xs font-semibold px-2 py-1 rounded bg-dark">
+                            ${order.estado}
+                        </span>
+                    </div>
+                    <p class="text-white font-semibold">${order.cliente}</p>
+                    <p class="text-gray-400 text-sm">📱 ${order.telefono}</p>
+                    <p class="text-gray-400 text-sm">🚚 ${order.tipo}</p>
+                    <div class="mt-2 pt-2 border-t border-gray-700">
+                        <p class="text-sm text-gray-400">${order.productos.length} productos</p>
+                        <p class="text-lg font-bold text-primary">$${order.totalUSD.toFixed(2)}</p>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <button onclick="updateOrderStatus('${order.id}', 'En Proceso')" class="flex-1 py-2 bg-primary/20 text-primary rounded-lg text-sm">Procesar</button>
+                        <button onclick="updateOrderStatus('${order.id}', 'Entregado')" class="flex-1 py-2 bg-green-500/20 text-green-400 rounded-lg text-sm">Entregar</button>
+                        <button onclick="updateOrderStatus('${order.id}', 'Cancelado')" class="flex-1 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm">Cancelar</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Actualizar stats
+            const todayOrders = orders.filter(o => o.fecha === new Date().toLocaleDateString());
+            document.getElementById('admin-pedidos-hoy').textContent = todayOrders.length;
+            document.getElementById('admin-ventas-hoy').textContent = '$' + todayOrders.reduce((sum, o) => sum + o.totalUSD, 0).toFixed(2);
+        }
+
+        function renderAdminProductos() {
+            const content = document.getElementById('admin-content');
+            content.innerHTML = appData.productos.map(p => `
+                <div class="admin-card p-3 rounded-xl mb-2 flex items-center justify-between">
+                    <div>
+                        <p class="text-white font-semibold">${p.nombre}</p>
+                        <p class="text-gray-400 text-sm">${p.categoriaNombre} - $${p.precioUSD}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs ${p.disponible ? 'text-green-400' : 'text-red-400'}">${p.disponible ? 'Disponible' : 'Agotado'}</span>
+                        <button onclick="toggleProduct('${p.codigo}')" class="w-8 h-8 rounded-full ${p.disponible ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}">
+                            <i class="fas fa-${p.disponible ? 'check' : 'times'}"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderAdminTasas() {
+            const content = document.getElementById('admin-content');
+            content.innerHTML = `
+                <div class="space-y-4">
+                    ${appData.tasas.map(t => `
+                        <div class="admin-card p-4 rounded-xl">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-white font-semibold">${t.nombre} (${t.simbolo})</p>
+                                    <p class="text-gray-400 text-sm">Valor: ${t.valor}</p>
+                                </div>
+                                <span class="text-xs ${t.estado === 'Activo' ? 'text-green-400' : 'text-red-400'}">${t.estado}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function updateOrderStatus(id, status) {
+            const order = orders.find(o => o.id === id);
+            if (order) {
+                order.estado = status;
+                localStorage.setItem('fastburguer_orders', JSON.stringify(orders));
+                renderAdminPedidos();
+                showToast(`Pedido ${id} ${status}`);
+            }
+        }
+
+        function toggleProduct(codigo) {
+            const product = appData.productos.find(p => p.codigo === codigo);
+            if (product) {
+                product.disponible = !product.disponible;
+                renderAdminProductos();
+                renderProducts();
+                showToast(`${product.nombre} ${product.disponible ? 'disponible' : 'agotado'}`);
+            }
+        }
+
+        // ==================== UTILIDADES ====================
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function showMenu() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showOrders() {
+            if (orders.length === 0) {
+                showToast('No tienes pedidos aún');
+                return;
+            }
+            // Mostrar últimos pedidos en un modal simple
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4';
+            modal.innerHTML = `
+                <div class="modal-overlay absolute inset-0" onclick="this.parentElement.remove()"></div>
+                <div class="bg-darkgray rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+                    <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                        <h2 class="text-xl font-bold">Mis Pedidos</h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-4">
+                        ${orders.slice().reverse().map(o => `
+                            <div class="bg-dark rounded-xl p-3 mb-2">
+                                <div class="flex justify-between">
+                                    <span class="text-primary font-bold">${o.id}</span>
+                                    <span class="text-xs ${o.estado === 'Entregado' ? 'text-green-400' : o.estado === 'Cancelado' ? 'text-red-400' : 'text-yellow-400'}">${o.estado}</span>
+                                </div>
+                                <p class="text-gray-400 text-sm">${o.fecha} - ${o.tipo}</p>
+                                <p class="text-white font-semibold">$${o.totalUSD.toFixed(2)}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Cambio de moneda
+        document.getElementById('currency-select').addEventListener('change', (e) => {
+            currentCurrency = e.target.value;
+            renderProducts();
+            updateCartUI();
+        });
+
+        // Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
+        }
+    </script>
+</body>
+</html>

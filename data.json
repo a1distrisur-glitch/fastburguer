@@ -1,0 +1,311 @@
+{
+  "productos": [
+    {
+      "codigo": "P002",
+      "nombre": "Carne o Pollo",
+      "descripcion": "220g de punta trasera molida o pechuga, queso amarillo, mozzarella, tocineta, pepinillos, cebolla, lechuga, tomate, salsas. Incluye papas y bebida.",
+      "precioUSD": 12.0,
+      "categoria": "C001",
+      "categoriaNombre": "Hamburguesas Premium",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P003",
+      "nombre": "La Ardiente",
+      "descripcion": "420g de pollo crispy, doritos o takis, tocineta, queso cheddar, cebolla caramelizada, pepinillos, salsa Adictiva. Incluye papas y bebida.",
+      "precioUSD": 15.0,
+      "categoria": "C001",
+      "categoriaNombre": "Hamburguesas Premium",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P004",
+      "nombre": "La Fuego",
+      "descripcion": "220g de pollo crispy, 220g de carne, takis, queso cheddar, tocineta, salsa adictiva. Incluye papas y bebida.",
+      "precioUSD": 17.0,
+      "categoria": "G001",
+      "categoriaNombre": "Hamburguesas Premium",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P005",
+      "nombre": "La Irresistible",
+      "descripcion": "440g de pechuga, 220g de carne, Chuleta Ahumada, chorizo ahumado, mix de quesos y tocineta. Incluye papas y bebida",
+      "precioUSD": 22.0,
+      "categoria": "G002",
+      "categoriaNombre": "Hamburguesas Premium",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P006",
+      "nombre": "Grillada",
+      "descripcion": "440g de pollo, 440g de punta trasera, 440g de lomo de cerdo, Chorizo, Chistorra, 500g de papas, barbecue y tártara.",
+      "precioUSD": 40.0,
+      "categoria": "G002",
+      "categoriaNombre": "Especialidades",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P007",
+      "nombre": "Patacón",
+      "descripcion": "500g de carne desmechada, 220g Pollo, queso cebú, jamón ahumado, 4 huevos, tocinetas, fundido de cheddar, vegetales.",
+      "precioUSD": 23.0,
+      "categoria": "G002",
+      "categoriaNombre": "Especialidades",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P008",
+      "nombre": "Waffles Burger",
+      "descripcion": "Waffles de yuca, 420g de lomo de cerdo, queso mozzarella, tocinetas, papas, salsa de yogur griego, vegetales.",
+      "precioUSD": 15.0,
+      "categoria": "G002",
+      "categoriaNombre": "Especialidades",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P009",
+      "nombre": "Shawarma",
+      "descripcion": "160g de lomito, vegetales frescos seleccionados, papas a la francesa.",
+      "precioUSD": 6.0,
+      "categoria": "G002",
+      "categoriaNombre": "Especialidades",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P010",
+      "nombre": "Salchipapa Personal",
+      "descripcion": "300g Papas, 3 Salchichas, tocineta.",
+      "precioUSD": 7.0,
+      "categoria": "G003",
+      "categoriaNombre": "Salchipapas",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P011",
+      "nombre": "Salchipapa Especial de Pollo",
+      "descripcion": "600g Papas, 440g Pollo, 6 Salchichas, Fundido de Queso cheddar, Tocinetas.",
+      "precioUSD": 22.0,
+      "categoria": "G003",
+      "categoriaNombre": "Salchipapas",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P012",
+      "nombre": "Salchipapa de Pollo",
+      "descripcion": "400g Papas, 150g Pollo, 4 Salchichas, Tocineta, Fundido de Queso cheddar.",
+      "precioUSD": 14.0,
+      "categoria": "G003",
+      "categoriaNombre": "Salchipapas",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P013",
+      "nombre": "Salchipapa Explosiva",
+      "descripcion": "1kg de papas, Pollo 420g, Lomito 420g, Lomo Cerdo 420g, 8 Salchichas Jumbo, 1 Chorizo, butifarras, mix quesos, maíz + bebida 1.5L.",
+      "precioUSD": 58.0,
+      "categoria": "G003",
+      "categoriaNombre": "Salchipapas",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P014",
+      "nombre": "Combo 4 Favoritas",
+      "descripcion": "Pollo 150g + 300g Papas + Bebida GRATIS (x4 unidades).",
+      "precioUSD": 24.0,
+      "categoria": "G004",
+      "categoriaNombre": "Promociones",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P015",
+      "nombre": "Combo 4 Premium",
+      "descripcion": "Carne o Pollo 220g + 300g Papas + Bebida GRATIS (x4 unidades).",
+      "precioUSD": 45.0,
+      "categoria": "G004",
+      "categoriaNombre": "Promociones",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P016",
+      "nombre": "Combo Tequeños/Pastelitos",
+      "descripcion": "10 unidades, incluye salsa Tártara, tomate y 1 Bebida.",
+      "precioUSD": 5.0,
+      "categoria": "G004",
+      "categoriaNombre": "Promociones",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P017",
+      "nombre": "The Boys Kids",
+      "descripcion": "2 Nuggets, 300g Papas, 1 Salchicha Premium, Jugo + Premio sorpresa.",
+      "precioUSD": 9.0,
+      "categoria": "G004",
+      "categoriaNombre": "Promociones",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P018",
+      "nombre": "Hamburguesa Pollo Promo",
+      "descripcion": "150g Pollo, tocineta, queso cheddar, cebolla y pepinillo.",
+      "precioUSD": 5.0,
+      "categoria": "G004",
+      "categoriaNombre": "Promociones",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P019",
+      "nombre": "Jugo Natural",
+      "descripcion": "Fresa, Parchita o Mora.",
+      "precioUSD": 3.5,
+      "categoria": "G005",
+      "categoriaNombre": "Bebidas",
+      "disponible": false,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P020",
+      "nombre": "Refresco",
+      "descripcion": "Individual.",
+      "precioUSD": 1.5,
+      "categoria": "G005",
+      "categoriaNombre": "Bebidas",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P021",
+      "nombre": "Papas Adicionales",
+      "descripcion": "350g de papas a la francesa.",
+      "precioUSD": 4.0,
+      "categoria": "G006",
+      "categoriaNombre": "Adicionales",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P022",
+      "nombre": "Delivery",
+      "descripcion": "Servicio Entrega",
+      "precioUSD": 2.0,
+      "categoria": "G007",
+      "categoriaNombre": "Delivery",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    },
+    {
+      "codigo": "P023",
+      "nombre": "Propinas",
+      "descripcion": "Propinas",
+      "precioUSD": 1.0,
+      "categoria": "G007",
+      "categoriaNombre": "Delivery",
+      "disponible": true,
+      "estado": "Activo",
+      "imagen": ""
+    }
+  ],
+  "tasas": [
+    {
+      "codigo": "T002",
+      "nombre": "Dolar",
+      "simbolo": "USD",
+      "fijar": false,
+      "valor": 500.0,
+      "estado": "Activo"
+    },
+    {
+      "codigo": "T003",
+      "nombre": "Euro",
+      "simbolo": "EUR",
+      "fijar": false,
+      "valor": 600.0,
+      "estado": "Activo"
+    },
+    {
+      "codigo": "T004",
+      "nombre": "Binance",
+      "simbolo": "BN",
+      "fijar": false,
+      "valor": 700.0,
+      "estado": "Activo"
+    }
+  ],
+  "categorias": [
+    {
+      "codigo": "G002",
+      "nombre": "Especialidades",
+      "descripcion": "Elaborado bajo Demanda No es Parte del Menu Diario",
+      "estado": "Activo"
+    },
+    {
+      "codigo": "G003",
+      "nombre": "Salchipapas",
+      "descripcion": "Panes Perro Calientes Full Relleno",
+      "estado": "Activo"
+    },
+    {
+      "codigo": "G004",
+      "nombre": "Promociones",
+      "descripcion": "Gancho Diario a Semanal por Fechas Especiales o Demanda",
+      "estado": "Activo"
+    },
+    {
+      "codigo": "G005",
+      "nombre": "Bebidas",
+      "descripcion": "Gaseosas Agua Envasada",
+      "estado": "Activo"
+    },
+    {
+      "codigo": "G006",
+      "nombre": "Adicionales",
+      "descripcion": "Opciones para Agregar a los Productos",
+      "estado": "Activo"
+    },
+    {
+      "codigo": "G007",
+      "nombre": "Delivery",
+      "descripcion": "Servicio Entregas a Domicilio",
+      "estado": "Activo"
+    }
+  ],
+  "tiendaAbierta": true
+}
